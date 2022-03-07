@@ -15,3 +15,10 @@
 ## REST vs Streaming
 
 - Traditional requests have the end-user type in a page, and 
+
+## Streaming demo
+
+- 
+## Concluding thoughts
+
+- tie back to big data

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpaca Streaming</title>
+</head>
+<body>
+
+    <div id="stock"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.9.0.min.js"></script>
+    <!-- <script src="./stream.js"></script> -->
+    <script>
+
+        let socket = io();
+
+        Array.prototype.queueAdd = function(val){
+            if (this.length > 30) this.shift();
+            this.push(val);
+        }
+
+        let traces = [{
+            y:[],
+            x:[],
+            mode: 'lines+markers', 
+            marker: {color: 'red'},
+            name:"BidPrice"
+        },
+        {
+            y:[],
+            x:[],
+            mode: 'lines+markers', 
+            marker: {color: 'blue'},
+            name:"AskPrice"
+        }]
+       
+        Plotly.newPlot("stock", traces)
+
+        socket.on("connect", () =>{console.log("connected");})
+
+        socket.on("quote", (data)=> {
+            if (data.Exchange != "FTXU") return;
+            traces.map((trace)=>{
+                trace.y.queueAdd(data[trace.name]);
+                trace.x.queueAdd(data.Timestamp);
+            })
+
+            Plotly.newPlot("stock", traces)
+        
+        })
+    </script>
+</body>
+</html>
